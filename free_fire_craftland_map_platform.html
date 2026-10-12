@@ -1,0 +1,1693 @@
+<!DOCTYPE html>
+<html lang="bn" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FF Craftland Community - Map Sharing & Promotion</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        ffGold: '#FFB800',
+                        ffOrange: '#FF5500',
+                        ffDark: '#0d0f12',
+                        ffCard: '#181b20',
+                        ffBorder: '#2a2f38'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Teko:wght@500;700&family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #0d0f12; color: #f3f4f6; }
+        .ff-font { font-family: 'Teko', sans-serif; letter-spacing: 1px; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #181b20; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-ffDark text-gray-100 min-h-screen flex flex-col pb-16 md:pb-0">
+
+<header class="sticky top-0 z-40 bg-ffCard/90 backdrop-blur-md border-b border-ffBorder px-4 py-3 shadow-lg">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+        <!-- Logo & Title -->
+        <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('feed')">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-ffOrange to-ffGold flex items-center justify-center font-bold text-black text-xl shadow-lg shadow-ffOrange/20">
+                <i class="fa-solid fa-gamepad"></i>
+            </div>
+            <div>
+                <h1 class="ff-font text-2xl font-bold leading-none bg-gradient-to-r from-ffGold via-yellow-200 to-ffOrange bg-clip-text text-transparent">CRAFTLAND BD</h1>
+                <p class="text-[10px] text-gray-400 font-medium tracking-wide">FREE FIRE MAP COMMUNITY</p>
+            </div>
+        </div>
+
+        <!-- Live Stats Counters -->
+        <div class="hidden md:flex items-center space-x-4 bg-ffDark/80 px-4 py-1.5 rounded-full border border-ffBorder text-xs">
+            <div class="flex items-center space-x-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="text-gray-400">Online:</span>
+                <span id="stat-online-count" class="font-bold text-emerald-400">1</span>
+            </div>
+            <div class="h-3 w-px bg-ffBorder"></div>
+            <div class="flex items-center space-x-1.5">
+                <i class="fa-solid fa-users text-ffGold"></i>
+                <span class="text-gray-400">Total Users:</span>
+                <span id="stat-total-users" class="font-bold text-ffGold">0</span>
+            </div>
+        </div>
+
+        <!-- Navigation Actions -->
+        <div class="flex items-center space-x-2 md:space-x-3">
+            <button onclick="openUploadModal()" class="bg-gradient-to-r from-ffOrange to-ffGold hover:opacity-90 text-black font-bold px-3 py-1.5 rounded-lg flex items-center space-x-1 text-sm shadow-md transition transform active:scale-95">
+                <i class="fa-solid fa-plus text-base"></i>
+                <span class="hidden sm:inline">Upload Map</span>
+            </button>
+
+            <!-- Mailbox Icon with Badge -->
+            <button onclick="switchTab('mailbox')" class="relative p-2 rounded-lg bg-ffDark hover:bg-gray-800 border border-ffBorder text-gray-300 transition">
+                <i class="fa-solid fa-envelope text-lg"></i>
+                <span id="unread-mail-badge" class="hidden absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
+            </button>
+
+            <!-- User Auth Profile Dropdown/Trigger -->
+            <div id="auth-header-slot">
+                <!-- Injected via JS based on login state -->
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-3 sm:px-4 py-6 flex-1 w-full grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+    <!-- Left Sidebar / Navigation (Desktop) -->
+    <aside class="hidden lg:block lg:col-span-1 space-y-4">
+        <!-- User Profile Quick Card -->
+        <div id="sidebar-user-card" class="bg-ffCard rounded-2xl p-4 border border-ffBorder shadow-md">
+            <!-- Dynamic Content Injected JS -->
+        </div>
+
+        <!-- Navigation Menu -->
+        <div class="bg-ffCard rounded-2xl p-2 border border-ffBorder space-y-1">
+            <button onclick="switchTab('feed')" id="nav-feed" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm transition bg-ffOrange/20 text-ffGold border border-ffOrange/30">
+                <i class="fa-solid fa-fire text-lg w-5"></i>
+                <span>Map Feed</span>
+            </button>
+            <button onclick="switchTab('prime')" id="nav-prime" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm transition text-gray-400 hover:bg-ffDark hover:text-white">
+                <i class="fa-solid fa-crown text-lg w-5 text-yellow-400"></i>
+                <div class="flex items-center justify-between w-full">
+                    <span>Prime Feed</span>
+                    <span class="text-[10px] bg-yellow-400/20 text-yellow-300 px-1.5 py-0.5 rounded border border-yellow-400/30">Admin Only</span>
+                </div>
+            </button>
+            <button onclick="switchTab('promote')" id="nav-promote" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm transition text-gray-400 hover:bg-ffDark hover:text-white">
+                <i class="fa-solid fa-rocket text-lg w-5 text-ffOrange"></i>
+                <span>Promote Map (350 BDT)</span>
+            </button>
+            <button onclick="switchTab('mailbox')" id="nav-mailbox" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm transition text-gray-400 hover:bg-ffDark hover:text-white">
+                <i class="fa-solid fa-inbox text-lg w-5 text-blue-400"></i>
+                <span>Mailbox & Notifications</span>
+            </button>
+            <button onclick="openInboxModal()" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm transition text-gray-400 hover:bg-ffDark hover:text-white">
+                <i class="fa-solid fa-paper-plane text-lg w-5 text-emerald-400"></i>
+                <span>Send Direct Message</span>
+            </button>
+        </div>
+
+        <!-- Special Moderation Options (Owner & Admin Only) -->
+        <div id="admin-sidebar-options" class="hidden bg-ffCard rounded-2xl p-3 border border-red-500/30 space-y-2">
+            <div class="text-xs font-bold text-red-400 px-2 uppercase tracking-wider flex items-center justify-between">
+                <span>Moderation Panel</span>
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <button onclick="switchTab('see-users')" id="nav-see-users" class="nav-btn w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-semibold text-gray-300 hover:bg-ffDark hover:text-white transition">
+                <i class="fa-solid fa-users-gear text-sm text-cyan-400"></i>
+                <span>See Users & Ban</span>
+            </button>
+            <div id="owner-only-sidebar" class="hidden space-y-1 pt-1 border-t border-ffBorder">
+                <button onclick="switchTab('admin-hub')" id="nav-admin-hub" class="nav-btn w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-semibold text-gray-300 hover:bg-ffDark hover:text-white transition">
+                    <i class="fa-solid fa-user-shield text-sm text-ffGold"></i>
+                    <span>Admin Management</span>
+                </button>
+                <button onclick="switchTab('owner-mailboxes')" id="nav-owner-mailboxes" class="nav-btn w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-semibold text-gray-300 hover:bg-ffDark hover:text-white transition">
+                    <i class="fa-solid fa-boxes-packing text-sm text-yellow-500"></i>
+                    <span>Owner Requests & Approvals</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Center Dynamic Content Section -->
+    <section class="col-span-1 lg:col-span-3 space-y-6">
+
+        <!-- Banner for Promotion -->
+        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-orange-600 via-ffOrange to-ffGold p-6 text-black shadow-xl">
+            <div class="relative z-10 max-w-xl">
+                <span class="bg-black/80 text-ffGold text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">Promote Your Map</span>
+                <h2 class="ff-font text-3xl md:text-4xl font-bold mt-2 leading-none text-white drop-shadow">Get 10x More Plays & Visibility!</h2>
+                <p class="text-xs md:text-sm font-medium mt-1 text-gray-900 drop-shadow-sm">Promote your Free Fire Craftland Map on top of our homepage for just <strong class="text-black">350 BDT</strong> (Nagod Payment).</p>
+                <button onclick="switchTab('promote')" class="mt-4 bg-black text-ffGold hover:bg-gray-900 font-bold px-5 py-2 rounded-xl text-sm transition flex items-center space-x-2 shadow-lg">
+                    <i class="fa-solid fa-bolt text-ffOrange"></i>
+                    <span>Promote Now</span>
+                </button>
+            </div>
+            <i class="fa-solid fa-map-location-dot absolute -right-6 -bottom-6 text-9xl text-black/10 transform -rotate-12 pointer-events-none"></i>
+        </div>
+
+        <!-- TAB CONTENT: MAP FEED -->
+        <div id="tab-feed" class="tab-page space-y-4">
+            <!-- Search & Filter Bar -->
+            <div class="bg-ffCard p-3 rounded-2xl border border-ffBorder flex flex-col sm:flex-row items-center gap-3">
+                <div class="relative w-full">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-gray-400"></i>
+                    <input type="text" id="map-search-input" onkeyup="renderFeed()" placeholder="Search map by name, map code, or creator UID..." class="w-full bg-ffDark border border-ffBorder rounded-xl pl-10 pr-4 py-2 text-sm text-gray-200 focus:outline-none focus:border-ffGold transition">
+                </div>
+                <button onclick="openUploadModal()" class="w-full sm:w-auto bg-ffDark hover:bg-gray-800 text-ffGold border border-ffOrange/40 font-semibold px-4 py-2 rounded-xl text-sm flex items-center justify-center space-x-2 whitespace-nowrap">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>New Map</span>
+                </button>
+            </div>
+
+            <!-- Feed Posts Container -->
+            <div id="feed-container" class="space-y-5">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+
+        <!-- TAB CONTENT: PRIME FEED -->
+        <div id="tab-prime" class="tab-page hidden space-y-4">
+            <div class="bg-ffCard p-4 rounded-2xl border border-yellow-500/30 flex items-center justify-between">
+                <div>
+                    <h3 class="ff-font text-2xl font-bold text-yellow-400 flex items-center space-x-2">
+                        <i class="fa-solid fa-crown"></i>
+                        <span>PRIME FEED</span>
+                    </h3>
+                    <p class="text-xs text-gray-400">Official updates from Owner & Admins. Regular users can only view posts.</p>
+                </div>
+                <button id="prime-create-btn" onclick="openPrimePostModal()" class="hidden bg-gradient-to-r from-yellow-500 to-amber-600 text-black font-bold px-4 py-2 rounded-xl text-xs flex items-center space-x-1 shadow">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    <span>Post Official Announcement</span>
+                </button>
+            </div>
+            <div id="prime-feed-container" class="space-y-4">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+
+        <!-- TAB CONTENT: PROMOTE MAP -->
+        <div id="tab-promote" class="tab-page hidden space-y-4">
+            <div class="bg-ffCard p-6 rounded-2xl border border-ffBorder max-w-2xl mx-auto">
+                <h3 class="ff-font text-3xl font-bold text-ffGold flex items-center space-x-2">
+                    <i class="fa-solid fa-rocket text-ffOrange"></i>
+                    <span>PROMOTE YOUR CRAFTLAND MAP</span>
+                </h3>
+                <p class="text-xs text-gray-400 mt-1">Get top placement on our home feed for 24 hours.</p>
+
+                <!-- Instructions & Nagod Info -->
+                <div class="mt-5 p-4 rounded-xl bg-orange-950/30 border border-orange-500/30 space-y-2">
+                    <div class="flex items-center space-x-2 text-ffOrange font-bold text-sm">
+                        <i class="fa-solid fa-mobile-screen-button"></i>
+                        <span>Payment Instructions (Nagod Cash In / Send Money)</span>
+                    </div>
+                    <p class="text-xs text-gray-300">Amount: <strong class="text-ffGold font-bold text-sm">350 BDT</strong></p>
+                    <div class="flex items-center space-x-3 bg-ffDark p-3 rounded-lg border border-ffBorder">
+                        <span class="text-xs text-gray-400">Nagod Number:</span>
+                        <span class="font-mono text-base font-bold text-emerald-400 select-all">01615766634</span>
+                        <button onclick="copyToClipboard('01615766634')" class="ml-auto text-xs bg-gray-800 hover:bg-gray-700 px-2.5 py-1 rounded text-gray-300">Copy</button>
+                    </div>
+                </div>
+
+                <!-- Form -->
+                <form onsubmit="handlePromotionSubmit(event)" class="mt-6 space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Your UID</label>
+                        <input type="text" id="promo-uid" required placeholder="Enter Free Fire UID" class="w-full bg-ffDark border border-ffBorder rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-ffGold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Craftland Map Code</label>
+                        <input type="text" id="promo-map-code" required placeholder="#FREEFIRE..." class="w-full bg-ffDark border border-ffBorder rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-ffGold font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Transaction ID (TrxID)</label>
+                        <input type="text" id="promo-trxid" required placeholder="Nagod TrxID" class="w-full bg-ffDark border border-ffBorder rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-ffGold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Cover Photo Upload</label>
+                        <input type="file" id="promo-cover" accept="image/*" required class="w-full text-xs text-gray-400 border border-ffBorder rounded-xl p-2 bg-ffDark file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-ffGold file:text-black">
+                    </div>
+                    <button type="submit" class="w-full bg-gradient-to-r from-ffOrange to-ffGold hover:opacity-90 text-black font-bold py-3 rounded-xl transition text-sm shadow-lg">
+                        Submit Promotion Request (350 BDT)
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- TAB CONTENT: MAILBOX -->
+        <div id="tab-mailbox" class="tab-page hidden space-y-4">
+            <div class="bg-ffCard p-5 rounded-2xl border border-ffBorder">
+                <div class="flex items-center justify-between mb-4 border-b border-ffBorder pb-3">
+                    <h3 class="ff-font text-2xl font-bold text-ffGold flex items-center space-x-2">
+                        <i class="fa-solid fa-inbox text-blue-400"></i>
+                        <span>YOUR MAILBOX</span>
+                    </h3>
+                    <button onclick="openInboxModal()" class="text-xs bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600/30 px-3 py-1.5 rounded-lg border border-emerald-500/30 transition font-semibold">
+                        + Send Direct Message
+                    </button>
+                </div>
+                <div id="user-mailbox-container" class="space-y-3">
+                    <!-- Dynamic user mail items -->
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB CONTENT: OWNER MAILBOXES & REQUESTS (Owner Only) -->
+        <div id="tab-owner-mailboxes" class="tab-page hidden space-y-6">
+            <!-- Mailbox 1: Payment Approvals -->
+            <div class="bg-ffCard p-5 rounded-2xl border border-yellow-500/40">
+                <h3 class="ff-font text-2xl font-bold text-yellow-400 flex items-center space-x-2 border-b border-ffBorder pb-3">
+                    <i class="fa-solid fa-money-bill-check text-emerald-400"></i>
+                    <span>OWNER MAILBOX 1: PAYMENT APPROVALS</span>
+                </h3>
+                <div id="owner-payments-container" class="space-y-4 mt-4">
+                    <!-- Dynamic payment approval requests -->
+                </div>
+            </div>
+
+            <!-- Mailbox 2: Direct User Messages, Admin Requests & Reports -->
+            <div class="bg-ffCard p-5 rounded-2xl border border-blue-500/40">
+                <h3 class="ff-font text-2xl font-bold text-blue-400 flex items-center space-x-2 border-b border-ffBorder pb-3">
+                    <i class="fa-solid fa-envelope-open-text text-cyan-400"></i>
+                    <span>OWNER MAILBOX 2: MESSAGES, REPORTS & ADMIN REQUESTS</span>
+                </h3>
+                <div id="owner-messages-container" class="space-y-4 mt-4">
+                    <!-- Dynamic owner messages -->
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB CONTENT: ADMIN MANAGEMENT HUB (Owner Only) -->
+        <div id="tab-admin-hub" class="tab-page hidden space-y-5">
+            <div class="bg-ffCard p-6 rounded-2xl border border-ffGold/30">
+                <h3 class="ff-font text-3xl font-bold text-ffGold flex items-center space-x-2">
+                    <i class="fa-solid fa-user-shield text-yellow-400"></i>
+                    <span>ADMIN MANAGEMENT HUB</span>
+                </h3>
+                <p class="text-xs text-gray-400 mb-6">Owner can search users by Name or UID to assign Admin rights or revoke current Admins.</p>
+
+                <!-- Search User Box -->
+                <div class="space-y-3 bg-ffDark p-4 rounded-xl border border-ffBorder">
+                    <label class="block text-xs font-bold text-gray-300">Search User to Add as Admin:</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="admin-search-input" placeholder="Enter Username or User UID..." class="w-full bg-ffCard border border-ffBorder rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-ffGold">
+                        <button onclick="searchUserForAdmin()" class="bg-ffGold hover:bg-yellow-500 text-black font-bold px-4 py-2 rounded-xl text-sm">Search</button>
+                    </div>
+                </div>
+
+                <!-- Search Results Box -->
+                <div id="admin-search-result" class="mt-4"></div>
+
+                <!-- Active Admins List -->
+                <div class="mt-8">
+                    <h4 class="text-sm font-bold text-gray-200 uppercase tracking-wider mb-3">Current Platform Admins</h4>
+                    <div id="active-admins-list" class="space-y-3">
+                        <!-- Dynamic active admins list -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB CONTENT: SEE USERS & MODERATION (Owner & Admin) -->
+        <div id="tab-see-users" class="tab-page hidden space-y-5">
+            <div class="bg-ffCard p-6 rounded-2xl border border-ffBorder">
+                <h3 class="ff-font text-3xl font-bold text-cyan-400 flex items-center space-x-2">
+                    <i class="fa-solid fa-users-viewfinder"></i>
+                    <span>USER MODERATION & DIRECTORY</span>
+                </h3>
+                <p class="text-xs text-gray-400 mb-4">View total user details, search by UID/Name and manage bans.</p>
+
+                <div class="flex gap-2 mb-6">
+                    <input type="text" id="mod-user-search" onkeyup="renderUserDirectory()" placeholder="Filter registered users by name, UID or email..." class="w-full bg-ffDark border border-ffBorder rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-cyan-400">
+                </div>
+
+                <div id="users-directory-list" class="space-y-3">
+                    <!-- Dynamic user list -->
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB CONTENT: EDIT USER PROFILE -->
+        <div id="tab-profile" class="tab-page hidden space-y-5">
+            <div class="bg-ffCard p-6 rounded-2xl border border-ffBorder max-w-xl mx-auto">
+                <h3 class="ff-font text-3xl font-bold text-ffGold flex items-center space-x-2">
+                    <i class="fa-solid fa-user-pen"></i>
+                    <span>EDIT PROFILE</span>
+                </h3>
+
+                <form onsubmit="handleProfileUpdate(event)" class="mt-6 space-y-4">
+                    <div class="flex flex-col items-center justify-center space-y-3 mb-4">
+                        <img id="edit-profile-preview" src="" class="w-24 h-24 rounded-full object-cover border-2 border-ffGold shadow-lg">
+                        <label class="cursor-pointer text-xs bg-ffDark border border-ffBorder hover:bg-gray-800 text-gray-300 font-semibold px-3 py-1.5 rounded-lg">
+                            <span>Change Avatar</span>
+                            <input type="file" id="edit-profile-pic" accept="image/*" class="hidden" onchange="previewProfilePic(event)">
+                        </label>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Username</label>
+                        <input type="text" id="edit-username" required class="w-full bg-ffDark border border-ffBorder rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-ffGold">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Free Fire UID</label>
+                        <input type="text" id="edit-uid" required class="w-full bg-ffDark border border-ffBorder rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-ffGold">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Bio / Status</label>
+                        <textarea id="edit-bio" rows="2" placeholder="Write something about your Craftland maps..." class="w-full bg-ffDark border border-ffBorder rounded-xl p-3 text-sm focus:outline-none focus:border-ffGold"></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full bg-gradient-to-r from-ffOrange to-ffGold text-black font-bold py-3 rounded-xl transition text-sm shadow-md">
+                        Save Changes
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </section>
+</main>
+
+<div class="fixed bottom-0 left-0 right-0 bg-ffCard/95 backdrop-blur-md border-t border-ffBorder lg:hidden z-30 px-3 py-2 flex justify-around items-center">
+    <button onclick="switchTab('feed')" class="flex flex-col items-center text-xs text-ffGold">
+        <i class="fa-solid fa-fire text-lg"></i>
+        <span class="text-[10px]">Feed</span>
+    </button>
+    <button onclick="switchTab('prime')" class="flex flex-col items-center text-xs text-yellow-400">
+        <i class="fa-solid fa-crown text-lg"></i>
+        <span class="text-[10px]">Prime</span>
+    </button>
+    <button onclick="openUploadModal()" class="flex flex-col items-center justify-center -mt-5 bg-gradient-to-tr from-ffOrange to-ffGold w-12 h-12 rounded-full text-black shadow-lg">
+        <i class="fa-solid fa-plus text-xl"></i>
+    </button>
+    <button onclick="switchTab('promote')" class="flex flex-col items-center text-xs text-ffOrange">
+        <i class="fa-solid fa-rocket text-lg"></i>
+        <span class="text-[10px]">Promote</span>
+    </button>
+    <button onclick="switchTab('mailbox')" class="flex flex-col items-center text-xs text-blue-400">
+        <i class="fa-solid fa-inbox text-lg"></i>
+        <span class="text-[10px]">Mailbox</span>
+    </button>
+</div>
+
+
+<!-- AUTH MODAL (Login / Signup) -->
+<div id="auth-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-ffCard rounded-2xl border border-ffBorder max-w-md w-full p-6 relative shadow-2xl overflow-y-auto max-h-[90vh]">
+        <!-- Tabs for Auth -->
+        <div class="flex border-b border-ffBorder mb-5">
+            <button id="auth-tab-login-btn" onclick="switchAuthTab('login')" class="w-1/2 py-2 font-bold text-center border-b-2 border-ffGold text-ffGold text-sm">Login</button>
+            <button id="auth-tab-signup-btn" onclick="switchAuthTab('signup')" class="w-1/2 py-2 font-bold text-center text-gray-400 hover:text-white text-sm">Sign Up</button>
+        </div>
+
+        <!-- LOGIN FORM -->
+        <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+            <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-1">Email Address</label>
+                <input type="email" id="login-email" required placeholder="name@domain.com" class="w-full bg-ffDark border border-ffBorder rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-ffGold">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-1">Password</label>
+                <input type="password" id="login-password" required placeholder="••••••••" class="w-full bg-ffDark border border-ffBorder rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-ffGold">
+            </div>
+            <button type="submit" class="w-full bg-gradient-to-r from-ffOrange to-ffGold text-black font-bold py-3 rounded-xl text-sm transition shadow-md">
+                Login to Account
+            </button>
+        </form>
+
+        <!-- SIGNUP FORM -->
+        <form id="signup-form" onsubmit="handleSignup(event)" class="hidden space-y-3">
+            <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-1">Username</label>
+                <input type="text" id="signup-username" required placeholder="Gaming Name" class="w-full bg-ffDark border border-ffBorder rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-ffGold">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-1">Email</label>
+                <input type="email" id="signup-email" required placeholder="example@gmail.com" class="w-full bg-ffDark border border-ffBorder rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-ffGold">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-1">Free Fire UID</label>
+                <input type="text" id="signup-uid" required placeholder="123456789" class="w-full bg-ffDark border border-ffBorder rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-ffGold">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-1">Profile Picture File</label>
+                <input type="file" id="signup-pic" accept="image/*" required class="w-full text-xs text-gray-400 border border-ffBorder rounded-xl p-1.5 bg-ffDark file:mr-3 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:bg-ffGold file:text-black">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-1">Password</label>
+                <input type="password" id="signup-password" required placeholder="••••••••" class="w-full bg-ffDark border border-ffBorder rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-ffGold">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-1">Confirm Password</label>
+                <input type="password" id="signup-confirm-password" required placeholder="••••••••" class="w-full bg-ffDark border border-ffBorder rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-ffGold">
+            </div>
+            <button type="submit" class="w-full bg-gradient-to-r from-ffOrange to-ffGold text-black font-bold py-2.5 rounded-xl text-sm transition shadow-md">
+                Create Account
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- MAP UPLOAD MODAL (+ Icon Form) -->
+<div id="upload-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-ffCard rounded-2xl border border-ffBorder max-w-lg w-full p-6 relative shadow-2xl">
+        <button onclick="closeUploadModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+        <h3 class="ff-font text-2xl font-bold text-ffGold flex items-center space-x-2">
+            <i class="fa-solid fa-cloud-arrow-up text-ffOrange"></i>
+            <span>POST CRAFTLAND MAP</span>
+        </h3>
+        <form onsubmit="handleMapUpload(event)" class="mt-4 space-y-4">
+            <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-1">Your Free Fire UID</label>
+                <input type="text" id="upload-uid" required class="w-full bg-ffDark border border-ffBorder rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-ffGold">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-1">Craftland Map Code</label>
+                <input type="text" id="upload-map-code" placeholder="#FREEFIRE1234..." required class="w-full bg-ffDark border border-ffBorder rounded-xl px-4 py-2 text-sm font-mono focus:outline-none focus:border-ffGold">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-1">Craftland Cover Image (File)</label>
+                <input type="file" id="upload-cover-img" accept="image/*" required class="w-full text-xs text-gray-400 border border-ffBorder rounded-xl p-2 bg-ffDark file:mr-3 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:bg-ffGold file:text-black">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-1">Map Description / Info</label>
+                <textarea id="upload-desc" rows="3" placeholder="Describe rules, mode, player count..." class="w-full bg-ffDark border border-ffBorder rounded-xl p-3 text-sm focus:outline-none focus:border-ffGold"></textarea>
+            </div>
+            <button type="submit" class="w-full bg-gradient-to-r from-ffOrange to-ffGold text-black font-bold py-3 rounded-xl transition text-sm shadow-md">
+                Upload & Publish Map
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- REPORT MODAL -->
+<div id="report-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-ffCard rounded-2xl border border-red-500/40 max-w-md w-full p-6 relative shadow-2xl">
+        <button onclick="closeReportModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        <h3 class="ff-font text-2xl font-bold text-red-500 flex items-center space-x-2">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span>REPORT MAP POST</span>
+        </h3>
+        <p class="text-xs text-gray-400 mt-1">Detailed report will be sent directly to Owner & Admin Mailboxes.</p>
+        <form onsubmit="submitReport(event)" class="mt-4 space-y-4">
+            <input type="hidden" id="report-post-id">
+            <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-1">Reason for Report</label>
+                <textarea id="report-reason" required rows="4" placeholder="Explain why this map violates rules (e.g. invalid map code, fake thumbnail, offensive text)..." class="w-full bg-ffDark border border-ffBorder rounded-xl p-3 text-sm focus:outline-none focus:border-red-500"></textarea>
+            </div>
+            <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl text-sm transition">
+                Submit Report to Admin
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- DIRECT MESSAGE / INBOX MODAL -->
+<div id="inbox-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-ffCard rounded-2xl border border-ffBorder max-w-md w-full p-6 relative shadow-2xl">
+        <button onclick="closeInboxModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        <h3 class="ff-font text-2xl font-bold text-emerald-400 flex items-center space-x-2">
+            <i class="fa-solid fa-paper-plane"></i>
+            <span>SEND DIRECT MESSAGE</span>
+        </h3>
+        <form onsubmit="sendDirectMessage(event)" class="mt-4 space-y-4">
+            <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-1">Select Recipient</label>
+                <select id="msg-recipient" class="w-full bg-ffDark border border-ffBorder rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-400">
+                    <option value="owner">Platform Owner (Eshan)</option>
+                    <option value="admin">Platform Admins</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-1">Your Message</label>
+                <textarea id="msg-content" required rows="4" placeholder="Write your feedback, question, or inquiry..." class="w-full bg-ffDark border border-ffBorder rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-400"></textarea>
+            </div>
+            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-sm transition">
+                Send Message
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- REQUEST TO BE ADMIN MODAL -->
+<div id="admin-req-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-ffCard rounded-2xl border border-ffGold/40 max-w-md w-full p-6 relative shadow-2xl">
+        <button onclick="closeAdminReqModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        <h3 class="ff-font text-2xl font-bold text-ffGold flex items-center space-x-2">
+            <i class="fa-solid fa-user-shield"></i>
+            <span>REQUEST TO BE ADMIN</span>
+        </h3>
+        <form onsubmit="submitAdminRequest(event)" class="mt-4 space-y-4">
+            <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-1">Why do you want to become an Admin?</label>
+                <textarea id="admin-req-reason" required rows="4" placeholder="Describe your experience and how you can help moderate this platform..." class="w-full bg-ffDark border border-ffBorder rounded-xl p-3 text-sm focus:outline-none focus:border-ffGold"></textarea>
+            </div>
+            <button type="submit" class="w-full bg-ffGold hover:bg-yellow-500 text-black font-bold py-2.5 rounded-xl text-sm transition">
+                Send Application to Owner
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- PRIME ANNOUNCEMENT POST MODAL (Owner/Admin) -->
+<div id="prime-post-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-ffCard rounded-2xl border border-yellow-500/50 max-w-md w-full p-6 relative shadow-2xl">
+        <button onclick="closePrimePostModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        <h3 class="ff-font text-2xl font-bold text-yellow-400 flex items-center space-x-2">
+            <i class="fa-solid fa-crown"></i>
+            <span>POST PRIME ANNOUNCEMENT</span>
+        </h3>
+        <form onsubmit="handlePrimePost(event)" class="mt-4 space-y-4">
+            <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-1">Text Content</label>
+                <textarea id="prime-text" required rows="3" placeholder="Write official announcement..." class="w-full bg-ffDark border border-ffBorder rounded-xl p-3 text-sm focus:outline-none focus:border-yellow-400"></textarea>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-1">Attachment Image (Optional)</label>
+                <input type="file" id="prime-img" accept="image/*" class="w-full text-xs text-gray-400 border border-ffBorder rounded-xl p-1.5 bg-ffDark file:mr-3 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:bg-yellow-400 file:text-black">
+            </div>
+            <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-2.5 rounded-xl text-sm transition">
+                Publish Prime Update
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- EDIT MAP MODAL -->
+<div id="edit-map-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-ffCard rounded-2xl border border-ffBorder max-w-lg w-full p-6 relative shadow-2xl">
+        <button onclick="closeEditMapModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        <h3 class="ff-font text-2xl font-bold text-ffGold flex items-center space-x-2">
+            <i class="fa-solid fa-pen-to-square"></i>
+            <span>EDIT MAP POST</span>
+        </h3>
+        <form onsubmit="handleMapEditSubmit(event)" class="mt-4 space-y-4">
+            <input type="hidden" id="edit-post-id">
+            <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-1">Free Fire UID</label>
+                <input type="text" id="edit-post-uid" required class="w-full bg-ffDark border border-ffBorder rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-ffGold">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-1">Craftland Map Code</label>
+                <input type="text" id="edit-post-code" required class="w-full bg-ffDark border border-ffBorder rounded-xl px-4 py-2 text-sm font-mono focus:outline-none focus:border-ffGold">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-1">Description</label>
+                <textarea id="edit-post-desc" rows="3" class="w-full bg-ffDark border border-ffBorder rounded-xl p-3 text-sm focus:outline-none focus:border-ffGold"></textarea>
+            </div>
+            <button type="submit" class="w-full bg-gradient-to-r from-ffOrange to-ffGold text-black font-bold py-2.5 rounded-xl text-sm transition">
+                Save Post Changes
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- TOAST ALERT NOTIFICATION -->
+<div id="toast-container" class="fixed top-20 right-4 z-50 space-y-2 pointer-events-none"></div>
+
+<script>
+    // System Constants & Owner Specs
+    const OWNER_EMAIL = "ah4317769@gmail.com";
+    const OWNER_PASS = "eshan6755";
+
+    // Application State
+    let state = {
+        users: JSON.parse(localStorage.getItem('ff_craft_users')) || [],
+        posts: JSON.parse(localStorage.getItem('ff_craft_posts')) || [],
+        primePosts: JSON.parse(localStorage.getItem('ff_craft_prime_posts')) || [],
+        promotions: JSON.parse(localStorage.getItem('ff_craft_promotions')) || [],
+        messages: JSON.parse(localStorage.getItem('ff_craft_messages')) || [],
+        currentUser: JSON.parse(localStorage.getItem('ff_craft_current_user')) || null
+    };
+
+    // Initialize Default Data if empty
+    function initSeedData() {
+        let ownerUser = state.users.find(u => u.email === OWNER_EMAIL);
+        if (!ownerUser) {
+            ownerUser = {
+                id: 'user_owner_01',
+                email: OWNER_EMAIL,
+                password: OWNER_PASS,
+                username: 'Eshan (Owner)',
+                uid: '100000000',
+                role: 'owner',
+                pic: 'https://placehold.co/150x150/ff5500/000000?text=OWNER',
+                bio: 'Official Owner & Developer of FF Craftland BD.',
+                banned: false
+            };
+            state.users.push(ownerUser);
+            saveData();
+        }
+
+        if (state.posts.length === 0) {
+            state.posts = [
+                {
+                    id: 'post_demo_1',
+                    authorId: ownerUser.id,
+                    authorName: ownerUser.username,
+                    authorUid: ownerUser.uid,
+                    authorPic: ownerUser.pic,
+                    authorRole: 'owner',
+                    mapCode: '#FREEFIRE99887766',
+                    description: 'Welcome to FF Craftland BD Official Community! Upload your maps, like and share with friends!',
+                    coverImg: 'https://placehold.co/600x350/181b20/ffb800?text=Craftland+Map+Showcase',
+                    likes: ['user_owner_01'],
+                    comments: [
+                        { id: 'c1', userName: 'Eshan (Owner)', text: 'Feel free to promote your maps here!' }
+                    ],
+                    shares: 12,
+                    isPromoted: true,
+                    createdAt: new Date().toISOString()
+                }
+            ];
+            saveData();
+        }
+    }
+
+    // Save state to LocalStorage
+    function saveData() {
+        localStorage.setItem('ff_craft_users', JSON.stringify(state.users));
+        localStorage.setItem('ff_craft_posts', JSON.stringify(state.posts));
+        localStorage.setItem('ff_craft_prime_posts', JSON.stringify(state.primePosts));
+        localStorage.setItem('ff_craft_promotions', JSON.stringify(state.promotions));
+        localStorage.setItem('ff_craft_messages', JSON.stringify(state.messages));
+        localStorage.setItem('ff_craft_current_user', JSON.stringify(state.currentUser));
+    }
+
+    window.onload = function() {
+        initSeedData();
+        updateCounters();
+        renderAuthHeader();
+        renderSidebarCard();
+        renderFeed();
+        renderUserMailbox();
+
+        if (state.currentUser && (state.currentUser.role === 'owner' || state.currentUser.role === 'admin')) {
+            document.getElementById('admin-sidebar-options').classList.remove('hidden');
+            if (state.currentUser.role === 'owner') {
+                document.getElementById('owner-only-sidebar').classList.remove('hidden');
+            }
+        }
+    };
+
+    function updateCounters() {
+        document.getElementById('stat-total-users').innerText = state.users.length;
+        // Simulated online count + active users
+        document.getElementById('stat-online-count').innerText = Math.max(1, Math.floor(state.users.length * 0.4) + 1);
+    }
+
+    // Helper for Toast Alerts
+    function showToast(msg, type = 'success') {
+        const toastContainer = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        const bg = type === 'success' ? 'bg-emerald-600' : type === 'blue' ? 'bg-blue-600' : 'bg-red-600';
+        toast.className = `${bg} text-white text-xs font-bold px-4 py-3 rounded-xl shadow-lg flex items-center space-x-2 transition transform translate-y-0`;
+        toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-info'}"></i><span>${msg}</span>`;
+        toastContainer.appendChild(toast);
+        setTimeout(() => {
+            toast.remove();
+        }, 4000);
+    }
+
+    // Copy Helper
+    function copyToClipboard(text) {
+        const dummy = document.createElement("textarea");
+        document.body.appendChild(dummy);
+        dummy.value = text;
+        dummy.select();
+        document.execCommand("copy");
+        document.body.removeChild(dummy);
+        showToast("Copied to clipboard: " + text, 'success');
+    }
+
+    // Convert File to Base64 Promise
+    function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab-page').forEach(el => el.classList.add('hidden'));
+        const target = document.getElementById(`tab-${tabName}`);
+        if (target) target.classList.remove('hidden');
+
+        // Render tab content on switch
+        if (tabName === 'feed') renderFeed();
+        if (tabName === 'prime') renderPrimeFeed();
+        if (tabName === 'mailbox') renderUserMailbox();
+        if (tabName === 'owner-mailboxes') renderOwnerMailboxes();
+        if (tabName === 'admin-hub') renderActiveAdmins();
+        if (tabName === 'see-users') renderUserDirectory();
+        if (tabName === 'profile') loadProfileData();
+    }
+
+    function renderAuthHeader() {
+        const slot = document.getElementById('auth-header-slot');
+        if (state.currentUser) {
+            slot.innerHTML = `
+                <div class="flex items-center space-x-2">
+                    <button onclick="switchTab('profile')" class="flex items-center space-x-2 bg-ffDark border border-ffBorder p-1 pr-3 rounded-full hover:bg-gray-800 transition">
+                        <img src="${state.currentUser.pic}" class="w-7 h-7 rounded-full object-cover">
+                        <span class="text-xs font-bold max-w-[80px] truncate">${state.currentUser.username}</span>
+                    </button>
+                    <button onclick="handleLogout()" class="p-2 text-gray-400 hover:text-red-400 text-sm" title="Logout">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </button>
+                </div>
+            `;
+        } else {
+            slot.innerHTML = `
+                <button onclick="openAuthModal('login')" class="bg-ffGold hover:bg-yellow-500 text-black font-bold px-4 py-1.5 rounded-xl text-xs shadow transition">
+                    Login / Signup
+                </button>
+            `;
+        }
+    }
+
+    function renderSidebarCard() {
+        const container = document.getElementById('sidebar-user-card');
+        if (state.currentUser) {
+            const isOwner = state.currentUser.role === 'owner';
+            const isAdmin = state.currentUser.role === 'admin';
+            container.innerHTML = `
+                <div class="flex flex-col items-center text-center">
+                    <div class="relative">
+                        <img src="${state.currentUser.pic}" class="w-20 h-20 rounded-full object-cover border-2 border-ffGold shadow-md">
+                        ${isOwner ? '<span class="absolute -bottom-1 -right-1 bg-gradient-to-r from-ffOrange to-ffGold text-black text-[9px] font-black px-1.5 py-0.5 rounded-full border border-black uppercase">OWNER</span>' : ''}
+                        ${isAdmin ? '<span class="absolute -bottom-1 -right-1 bg-yellow-400 text-black text-[9px] font-black px-1.5 py-0.5 rounded-full border border-black uppercase">ADMIN</span>' : ''}
+                    </div>
+                    <h3 class="font-bold text-base mt-2 text-gray-100">${state.currentUser.username}</h3>
+                    <p class="text-xs text-ffGold font-mono">UID: ${state.currentUser.uid}</p>
+                    <p class="text-[11px] text-gray-400 mt-1 italic">${state.currentUser.bio || 'Craftland Map Creator'}</p>
+
+                    <div class="w-full mt-4 pt-3 border-t border-ffBorder flex justify-around text-center">
+                        <div>
+                            <span class="block text-xs font-bold text-gray-200">${state.posts.filter(p => p.authorId === state.currentUser.id).length}</span>
+                            <span class="text-[10px] text-gray-400">Maps</span>
+                        </div>
+                        <div>
+                            <span class="block text-xs font-bold text-gray-200">${state.users.length}</span>
+                            <span class="text-[10px] text-gray-400">Total Users</span>
+                        </div>
+                    </div>
+
+                    <div class="w-full mt-3 flex flex-col gap-1.5">
+                        <button onclick="switchTab('profile')" class="w-full bg-ffDark hover:bg-gray-800 text-xs text-gray-300 py-2 rounded-xl border border-ffBorder transition">
+                            Edit Profile
+                        </button>
+                        ${!isAdmin && !isOwner ? `
+                        <button onclick="openAdminReqModal()" class="w-full bg-yellow-500/10 hover:bg-yellow-500/20 text-xs text-yellow-400 py-1.5 rounded-xl border border-yellow-500/30 transition">
+                            Request to Admin
+                        </button>` : ''}
+                    </div>
+                </div>
+            `;
+        } else {
+            container.innerHTML = `
+                <div class="text-center py-4">
+                    <i class="fa-solid fa-user-lock text-4xl text-gray-500 mb-2"></i>
+                    <p class="text-xs text-gray-400">You are browsing as Guest.</p>
+                    <button onclick="openAuthModal('login')" class="mt-3 w-full bg-ffGold text-black font-bold py-2 rounded-xl text-xs">
+                        Login / Signup
+                    </button>
+                </div>
+            `;
+        }
+    }
+
+    function openAuthModal(mode = 'login') {
+        document.getElementById('auth-modal').classList.remove('hidden');
+        switchAuthTab(mode);
+    }
+
+    function closeAuthModal() {
+        document.getElementById('auth-modal').classList.add('hidden');
+    }
+
+    function switchAuthTab(mode) {
+        if (mode === 'login') {
+            document.getElementById('login-form').classList.remove('hidden');
+            document.getElementById('signup-form').classList.add('hidden');
+            document.getElementById('auth-tab-login-btn').className = "w-1/2 py-2 font-bold text-center border-b-2 border-ffGold text-ffGold text-sm";
+            document.getElementById('auth-tab-signup-btn').className = "w-1/2 py-2 font-bold text-center text-gray-400 hover:text-white text-sm";
+        } else {
+            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('signup-form').classList.remove('hidden');
+            document.getElementById('auth-tab-signup-btn').className = "w-1/2 py-2 font-bold text-center border-b-2 border-ffGold text-ffGold text-sm";
+            document.getElementById('auth-tab-login-btn').className = "w-1/2 py-2 font-bold text-center text-gray-400 hover:text-white text-sm";
+        }
+    }
+
+    function handleLogin(e) {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value.trim();
+        const pass = document.getElementById('login-password').value;
+
+        const user = state.users.find(u => u.email === email && u.password === pass);
+        if (user) {
+            if (user.banned) {
+                alert("Your account has been banned by platform moderation.");
+                return;
+            }
+            state.currentUser = user;
+            saveData();
+            closeAuthModal();
+            location.reload();
+        } else {
+            alert("Invalid Email or Password!");
+        }
+    }
+
+    async function handleSignup(e) {
+        e.preventDefault();
+        const username = document.getElementById('signup-username').value.trim();
+        const email = document.getElementById('signup-email').value.trim();
+        const uid = document.getElementById('signup-uid').value.trim();
+        const pass = document.getElementById('signup-password').value;
+        const confirmPass = document.getElementById('signup-confirm-password').value;
+        const picFile = document.getElementById('signup-pic').files[0];
+
+        if (pass !== confirmPass) {
+            alert("Passwords do not match!");
+            return;
+        }
+
+        if (state.users.some(u => u.email === email)) {
+            alert("Email already registered!");
+            return;
+        }
+
+        let base64Pic = 'https://placehold.co/150x150/181b20/ffffff?text=User';
+        if (picFile) {
+            base64Pic = await fileToBase64(picFile);
+        }
+
+        const newUser = {
+            id: 'user_' + Date.now(),
+            username,
+            email,
+            uid,
+            password: pass,
+            pic: base64Pic,
+            role: email === OWNER_EMAIL ? 'owner' : 'user',
+            bio: 'Craftland Map Creator',
+            banned: false
+        };
+
+        state.users.push(newUser);
+        state.currentUser = newUser;
+        saveData();
+        closeAuthModal();
+        location.reload();
+    }
+
+    function handleLogout() {
+        state.currentUser = null;
+        saveData();
+        location.reload();
+    }
+
+    function loadProfileData() {
+        if (!state.currentUser) {
+            openAuthModal();
+            return;
+        }
+        document.getElementById('edit-profile-preview').src = state.currentUser.pic;
+        document.getElementById('edit-username').value = state.currentUser.username;
+        document.getElementById('edit-uid').value = state.currentUser.uid;
+        document.getElementById('edit-bio').value = state.currentUser.bio || '';
+    }
+
+    async function previewProfilePic(e) {
+        if (e.target.files && e.target.files[0]) {
+            const base64 = await fileToBase64(e.target.files[0]);
+            document.getElementById('edit-profile-preview').src = base64;
+        }
+    }
+
+    async function handleProfileUpdate(e) {
+        e.preventDefault();
+        if (!state.currentUser) return;
+
+        const newUsername = document.getElementById('edit-username').value.trim();
+        const newUid = document.getElementById('edit-uid').value.trim();
+        const newBio = document.getElementById('edit-bio').value.trim();
+        const picFile = document.getElementById('edit-profile-pic').files[0];
+
+        let base64Pic = state.currentUser.pic;
+        if (picFile) {
+            base64Pic = await fileToBase64(picFile);
+        }
+
+        state.currentUser.username = newUsername;
+        state.currentUser.uid = newUid;
+        state.currentUser.bio = newBio;
+        state.currentUser.pic = base64Pic;
+
+        // Sync with users array
+        const idx = state.users.findIndex(u => u.id === state.currentUser.id);
+        if (idx !== -1) {
+            state.users[idx] = state.currentUser;
+        }
+
+        saveData();
+        showToast("Profile Updated Successfully!");
+        renderSidebarCard();
+        renderAuthHeader();
+        switchTab('feed');
+    }
+
+    function openUploadModal() {
+        if (!state.currentUser) {
+            openAuthModal();
+            return;
+        }
+        document.getElementById('upload-uid').value = state.currentUser.uid;
+        document.getElementById('upload-modal').classList.remove('hidden');
+    }
+
+    function closeUploadModal() {
+        document.getElementById('upload-modal').classList.add('hidden');
+    }
+
+    async function handleMapUpload(e) {
+        e.preventDefault();
+        const uid = document.getElementById('upload-uid').value.trim();
+        const mapCode = document.getElementById('upload-map-code').value.trim();
+        const desc = document.getElementById('upload-desc').value.trim();
+        const coverFile = document.getElementById('upload-cover-img').files[0];
+
+        let coverImgBase64 = '';
+        if (coverFile) {
+            coverImgBase64 = await fileToBase64(coverFile);
+        }
+
+        const newPost = {
+            id: 'post_' + Date.now(),
+            authorId: state.currentUser.id,
+            authorName: state.currentUser.username,
+            authorUid: uid,
+            authorPic: state.currentUser.pic,
+            authorRole: state.currentUser.role,
+            mapCode: mapCode,
+            description: desc,
+            coverImg: coverImgBase64,
+            likes: [],
+            comments: [],
+            shares: 0,
+            isPromoted: false,
+            createdAt: new Date().toISOString()
+        };
+
+        state.posts.unshift(newPost);
+        saveData();
+        closeUploadModal();
+        showToast("Map Posted Successfully!");
+        renderFeed();
+    }
+
+    function renderFeed() {
+        const container = document.getElementById('feed-container');
+        const query = document.getElementById('map-search-input')?.value.toLowerCase() || '';
+
+        let filtered = state.posts.filter(p => {
+            return p.mapCode.toLowerCase().includes(query) ||
+                   p.authorName.toLowerCase().includes(query) ||
+                   p.authorUid.toLowerCase().includes(query) ||
+                   p.description.toLowerCase().includes(query);
+        });
+
+        // Separate promoted posts to display first
+        filtered.sort((a, b) => (b.isPromoted ? 1 : 0) - (a.isPromoted ? 1 : 0));
+
+        if (filtered.length === 0) {
+            container.innerHTML = `
+                <div class="bg-ffCard p-8 rounded-2xl border border-ffBorder text-center text-gray-400">
+                    <i class="fa-solid fa-map-location text-4xl mb-2 text-gray-600"></i>
+                    <p class="text-sm">No Craftland Maps Found.</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = filtered.map(post => {
+            const isLiked = state.currentUser ? post.likes.includes(state.currentUser.id) : false;
+            const canEditOrDelete = state.currentUser && (
+                state.currentUser.id === post.authorId ||
+                state.currentUser.role === 'owner' ||
+                state.currentUser.role === 'admin'
+            );
+
+            return `
+                <div class="bg-ffCard rounded-2xl border ${post.isPromoted ? 'border-ffGold shadow-lg shadow-ffGold/10' : 'border-ffBorder'} overflow-hidden transition">
+                    ${post.isPromoted ? `
+                    <div class="bg-gradient-to-r from-ffOrange to-ffGold text-black font-extrabold text-[11px] px-4 py-1 flex items-center justify-between">
+                        <span><i class="fa-solid fa-bolt"></i> PROMOTED CRAFTLAND MAP</span>
+                        <span class="bg-black/20 px-2 py-0.5 rounded text-[9px]">24H FEATURED</span>
+                    </div>` : ''}
+
+                    <!-- Post Header -->
+                    <div class="p-4 flex items-center justify-between border-b border-ffBorder/50">
+                        <div class="flex items-center space-x-3">
+                            <img src="${post.authorPic}" class="w-10 h-10 rounded-full object-cover border border-ffBorder">
+                            <div>
+                                <div class="flex items-center space-x-1.5">
+                                    <h4 class="font-bold text-sm text-gray-100">${post.authorName}</h4>
+                                    ${post.authorRole === 'owner' ? '<span class="bg-gradient-to-r from-ffOrange to-ffGold text-black font-black text-[9px] px-1.5 py-0.2 rounded">OWNER</span>' : ''}
+                                    ${post.authorRole === 'admin' ? '<span class="bg-yellow-400 text-black font-black text-[9px] px-1.5 py-0.2 rounded">ADMIN</span>' : ''}
+                                </div>
+                                <p class="text-xs text-ffGold font-mono">UID: ${post.authorUid}</p>
+                            </div>
+                        </div>
+
+                        <!-- 3-Dots Menu -->
+                        <div class="relative group">
+                            <button class="text-gray-400 hover:text-white p-2 text-base"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                            <div class="absolute right-0 top-8 bg-ffDark border border-ffBorder rounded-xl shadow-xl py-1 w-36 hidden group-hover:block z-20">
+                                ${canEditOrDelete ? `
+                                    <button onclick="openEditMapModal('${post.id}')" class="w-full text-left px-3 py-1.5 text-xs text-gray-300 hover:bg-gray-800 flex items-center space-x-2">
+                                        <i class="fa-solid fa-pen text-yellow-400"></i><span>Edit</span>
+                                    </button>
+                                    <button onclick="deleteMapPost('${post.id}')" class="w-full text-left px-3 py-1.5 text-xs text-red-400 hover:bg-gray-800 flex items-center space-x-2">
+                                        <i class="fa-solid fa-trash"></i><span>Delete</span>
+                                    </button>
+                                ` : ''}
+                                <button onclick="openReportModal('${post.id}')" class="w-full text-left px-3 py-1.5 text-xs text-orange-400 hover:bg-gray-800 flex items-center space-x-2">
+                                    <i class="fa-solid fa-flag"></i><span>Report Map</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Post Body -->
+                    <div class="p-4 space-y-3">
+                        <p class="text-xs text-gray-300 leading-relaxed">${post.description}</p>
+
+                        <!-- Map Code Display Box -->
+                        <div class="bg-ffDark p-3 rounded-xl border border-ffBorder flex items-center justify-between">
+                            <div>
+                                <span class="text-[10px] text-gray-400 block uppercase font-bold">Craftland Code</span>
+                                <span class="font-mono text-sm font-bold text-ffGold select-all">${post.mapCode}</span>
+                            </div>
+                            <button onclick="copyToClipboard('${post.mapCode}')" class="bg-ffGold/10 hover:bg-ffGold/20 text-ffGold border border-ffGold/30 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1">
+                                <i class="fa-solid fa-copy"></i><span>Copy</span>
+                            </button>
+                        </div>
+
+                        <!-- Cover Image -->
+                        ${post.coverImg ? `<img src="${post.coverImg}" class="w-full h-56 md:h-72 object-cover rounded-xl border border-ffBorder">` : ''}
+                    </div>
+
+                    <!-- Post Footer (Likes, Comments, Shares) -->
+                    <div class="px-4 py-3 bg-ffDark/50 border-t border-ffBorder flex items-center justify-between text-xs text-gray-400">
+                        <button onclick="toggleLikePost('${post.id}')" class="flex items-center space-x-1.5 ${isLiked ? 'text-red-500 font-bold' : 'hover:text-white'} transition">
+                            <i class="fa-solid fa-heart ${isLiked ? 'text-red-500' : ''}"></i>
+                            <span>${post.likes.length} Likes</span>
+                        </button>
+                        <button onclick="toggleCommentsSection('${post.id}')" class="flex items-center space-x-1.5 hover:text-white transition">
+                            <i class="fa-solid fa-comment"></i>
+                            <span>${post.comments.length} Comments</span>
+                        </button>
+                        <button onclick="incrementShare('${post.id}')" class="flex items-center space-x-1.5 hover:text-white transition">
+                            <i class="fa-solid fa-share"></i>
+                            <span>${post.shares} Shares</span>
+                        </button>
+                    </div>
+
+                    <!-- Comments Drawer -->
+                    <div id="comments-box-${post.id}" class="hidden p-4 bg-ffDark border-t border-ffBorder space-y-3">
+                        <div id="comments-list-${post.id}" class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar">
+                            ${post.comments.map(c => `
+                                <div class="bg-ffCard p-2.5 rounded-lg text-xs">
+                                    <span class="font-bold text-ffGold">${c.userName}:</span>
+                                    <span class="text-gray-300 ml-1">${c.text}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="flex gap-2 pt-1">
+                            <input type="text" id="comment-input-${post.id}" placeholder="Write a comment..." class="w-full bg-ffCard border border-ffBorder rounded-lg px-3 py-1.5 text-xs text-gray-200 focus:outline-none focus:border-ffGold">
+                            <button onclick="addComment('${post.id}')" class="bg-ffGold text-black font-bold px-3 py-1.5 rounded-lg text-xs">Post</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function toggleLikePost(postId) {
+        if (!state.currentUser) { openAuthModal(); return; }
+        const post = state.posts.find(p => p.id === postId);
+        if (!post) return;
+
+        const idx = post.likes.indexOf(state.currentUser.id);
+        if (idx === -1) {
+            post.likes.push(state.currentUser.id);
+        } else {
+            post.likes.splice(idx, 1);
+        }
+        saveData();
+        renderFeed();
+    }
+
+    function toggleCommentsSection(postId) {
+        const box = document.getElementById(`comments-box-${postId}`);
+        if (box) box.classList.toggle('hidden');
+    }
+
+    function addComment(postId) {
+        if (!state.currentUser) { openAuthModal(); return; }
+        const input = document.getElementById(`comment-input-${postId}`);
+        const text = input.value.trim();
+        if (!text) return;
+
+        const post = state.posts.find(p => p.id === postId);
+        if (!post) return;
+
+        post.comments.push({
+            id: 'c_' + Date.now(),
+            userName: state.currentUser.username,
+            text: text
+        });
+
+        saveData();
+        input.value = '';
+        renderFeed();
+        document.getElementById(`comments-box-${postId}`).classList.remove('hidden');
+    }
+
+    function incrementShare(postId) {
+        const post = state.posts.find(p => p.id === postId);
+        if (!post) return;
+        post.shares += 1;
+        saveData();
+        copyToClipboard(post.mapCode);
+        renderFeed();
+    }
+
+    function deleteMapPost(postId) {
+        if (!confirm("Are you sure you want to delete this map post?")) return;
+        state.posts = state.posts.filter(p => p.id !== postId);
+        saveData();
+        showToast("Post Deleted Successfully");
+        renderFeed();
+    }
+
+    function openEditMapModal(postId) {
+        const post = state.posts.find(p => p.id === postId);
+        if (!post) return;
+
+        document.getElementById('edit-post-id').value = post.id;
+        document.getElementById('edit-post-uid').value = post.authorUid;
+        document.getElementById('edit-post-code').value = post.mapCode;
+        document.getElementById('edit-post-desc').value = post.description;
+
+        document.getElementById('edit-map-modal').classList.remove('hidden');
+    }
+
+    function closeEditMapModal() {
+        document.getElementById('edit-map-modal').classList.add('hidden');
+    }
+
+    function handleMapEditSubmit(e) {
+        e.preventDefault();
+        const id = document.getElementById('edit-post-id').value;
+        const post = state.posts.find(p => p.id === id);
+        if (!post) return;
+
+        post.authorUid = document.getElementById('edit-post-uid').value.trim();
+        post.mapCode = document.getElementById('edit-post-code').value.trim();
+        post.description = document.getElementById('edit-post-desc').value.trim();
+
+        saveData();
+        closeEditMapModal();
+        showToast("Map post updated successfully!");
+        renderFeed();
+    }
+
+    async function handlePromotionSubmit(e) {
+        e.preventDefault();
+        if (!state.currentUser) { openAuthModal(); return; }
+
+        const uid = document.getElementById('promo-uid').value.trim();
+        const mapCode = document.getElementById('promo-map-code').value.trim();
+        const trxid = document.getElementById('promo-trxid').value.trim();
+        const coverFile = document.getElementById('promo-cover').files[0];
+
+        let coverBase64 = '';
+        if (coverFile) coverBase64 = await fileToBase64(coverFile);
+
+        const promoReq = {
+            id: 'promo_' + Date.now(),
+            userId: state.currentUser.id,
+            userName: state.currentUser.username,
+            uid: uid,
+            mapCode: mapCode,
+            trxid: trxid,
+            coverImg: coverBase64,
+            status: 'pending',
+            createdAt: new Date().toISOString()
+        };
+
+        state.promotions.unshift(promoReq);
+
+        // Auto mail to User
+        state.messages.push({
+            id: 'msg_' + Date.now(),
+            recipientId: state.currentUser.id,
+            senderName: 'System Notification',
+            text: 'Thank you, you have promoted your map. Your map will be promoted within 24 hours.',
+            type: 'user_notification',
+            createdAt: new Date().toISOString()
+        });
+
+        saveData();
+
+        // Blue Alert Box as Requested
+        showToast("apnar taka pathano sofol hoye se 24 gonta opekkha korun amader akhon soho kari apnar pement aprovrd korve", 'blue');
+
+        switchTab('mailbox');
+    }
+
+    function renderUserMailbox() {
+        if (!state.currentUser) return;
+        const container = document.getElementById('user-mailbox-container');
+
+        const userMails = state.messages.filter(m => m.recipientId === state.currentUser.id);
+
+        if (userMails.length === 0) {
+            container.innerHTML = `<p class="text-xs text-gray-400 py-4 text-center">No messages in your mailbox.</p>`;
+            return;
+        }
+
+        container.innerHTML = userMails.map(m => `
+            <div class="bg-ffDark p-3.5 rounded-xl border border-ffBorder space-y-1">
+                <div class="flex justify-between items-center text-xs">
+                    <span class="font-bold text-ffGold">${m.senderName}</span>
+                    <span class="text-[10px] text-gray-500">${new Date(m.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                </div>
+                <p class="text-xs text-gray-300 leading-relaxed">${m.text}</p>
+            </div>
+        `).join('');
+    }
+
+    function openInboxModal() {
+        if (!state.currentUser) { openAuthModal(); return; }
+        document.getElementById('inbox-modal').classList.remove('hidden');
+    }
+
+    function closeInboxModal() {
+        document.getElementById('inbox-modal').classList.add('hidden');
+    }
+
+    function sendDirectMessage(e) {
+        e.preventDefault();
+        if (!state.currentUser) return;
+
+        const recipient = document.getElementById('msg-recipient').value;
+        const text = document.getElementById('msg-content').value.trim();
+
+        const newMsg = {
+            id: 'dm_' + Date.now(),
+            senderId: state.currentUser.id,
+            senderName: state.currentUser.username,
+            senderUid: state.currentUser.uid,
+            target: recipient,
+            text: text,
+            type: 'direct_message',
+            createdAt: new Date().toISOString()
+        };
+
+        state.messages.push(newMsg);
+        saveData();
+        closeInboxModal();
+        showToast("Message sent successfully!");
+    }
+
+    function openReportModal(postId) {
+        if (!state.currentUser) { openAuthModal(); return; }
+        document.getElementById('report-post-id').value = postId;
+        document.getElementById('report-modal').classList.remove('hidden');
+    }
+
+    function closeReportModal() {
+        document.getElementById('report-modal').classList.add('hidden');
+    }
+
+    function submitReport(e) {
+        e.preventDefault();
+        const postId = document.getElementById('report-post-id').value;
+        const reason = document.getElementById('report-reason').value.trim();
+        const post = state.posts.find(p => p.id === postId);
+
+        const reportMsg = {
+            id: 'rep_' + Date.now(),
+            senderName: state.currentUser.username,
+            senderUid: state.currentUser.uid,
+            postId: postId,
+            mapCode: post ? post.mapCode : 'N/A',
+            text: `[MAP REPORT] Reported Map Code: ${post ? post.mapCode : 'N/A'}. Reason: ${reason}`,
+            target: 'owner',
+            type: 'report',
+            createdAt: new Date().toISOString()
+        };
+
+        state.messages.push(reportMsg);
+        saveData();
+        closeReportModal();
+        showToast("Report submitted to platform moderation.");
+    }
+
+    function renderOwnerMailboxes() {
+        if (!state.currentUser || state.currentUser.role !== 'owner') return;
+
+        // Render Mailbox 1: Payment Approvals
+        const payContainer = document.getElementById('owner-payments-container');
+        const pendingPromos = state.promotions.filter(p => p.status === 'pending');
+
+        if (pendingPromos.length === 0) {
+            payContainer.innerHTML = `<p class="text-xs text-gray-400 py-2">No pending payment promotion requests.</p>`;
+        } else {
+            payContainer.innerHTML = pendingPromos.map(p => `
+                <div class="bg-ffDark p-4 rounded-xl border border-ffBorder space-y-3">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-bold text-sm text-ffGold">${p.userName}</h4>
+                            <p class="text-xs text-gray-400 font-mono">UID: ${p.uid} | TrxID: <strong class="text-emerald-400">${p.trxid}</strong></p>
+                            <p class="text-xs text-gray-300">Map Code: <span class="font-mono text-ffGold">${p.mapCode}</span></p>
+                        </div>
+                        <span class="bg-yellow-500/20 text-yellow-300 text-[10px] px-2 py-0.5 rounded border border-yellow-500/30">PENDING APPROVAL</span>
+                    </div>
+                    ${p.coverImg ? `<img src="${p.coverImg}" class="w-full h-36 object-cover rounded-lg border border-ffBorder">` : ''}
+                    <div class="flex gap-2">
+                        <button onclick="approvePromotion('${p.id}')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-1.5 rounded-lg text-xs">Approve Promotion</button>
+                        <button onclick="disapprovePromotion('${p.id}')" class="flex-1 bg-red-600 hover:bg-red-500 text-white font-bold py-1.5 rounded-lg text-xs">Disapprove</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render Mailbox 2: Direct Messages & Reports & Admin Requests
+        const msgContainer = document.getElementById('owner-messages-container');
+        const ownerMsgs = state.messages.filter(m => m.target === 'owner' || m.type === 'admin_request' || m.type === 'report' || m.type === 'direct_message');
+
+        if (ownerMsgs.length === 0) {
+            msgContainer.innerHTML = `<p class="text-xs text-gray-400 py-2">No messages or requests in Mailbox 2.</p>`;
+        } else {
+            msgContainer.innerHTML = ownerMsgs.map(m => `
+                <div class="bg-ffDark p-3.5 rounded-xl border border-ffBorder space-y-1">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="font-bold text-cyan-400">${m.senderName} (UID: ${m.senderUid || 'N/A'})</span>
+                        <span class="text-[10px] text-gray-500">${new Date(m.createdAt).toLocaleTimeString()}</span>
+                    </div>
+                    <p class="text-xs text-gray-300 leading-relaxed">${m.text}</p>
+                </div>
+            `).join('');
+        }
+    }
+
+    function approvePromotion(promoId) {
+        const promo = state.promotions.find(p => p.id === promoId);
+        if (!promo) return;
+
+        promo.status = 'approved';
+
+        // Find or create post and set as promoted
+        let post = state.posts.find(p => p.mapCode === promo.mapCode);
+        if (post) {
+            post.isPromoted = true;
+        }
+
+        // Send Approval Mail to User
+        state.messages.push({
+            id: 'msg_' + Date.now(),
+            recipientId: promo.userId,
+            senderName: 'Owner (Eshan)',
+            text: `Your promotion payment for Map Code ${promo.mapCode} has been APPROVED! Your map is now featured on top.`,
+            type: 'user_notification',
+            createdAt: new Date().toISOString()
+        });
+
+        saveData();
+        showToast("Promotion Approved Successfully!");
+        renderOwnerMailboxes();
+        renderFeed();
+    }
+
+    function disapprovePromotion(promoId) {
+        const promo = state.promotions.find(p => p.id === promoId);
+        if (!promo) return;
+
+        promo.status = 'disapproved';
+
+        // Send Disapproval Mail to User
+        state.messages.push({
+            id: 'msg_' + Date.now(),
+            recipientId: promo.userId,
+            senderName: 'Owner (Eshan)',
+            text: `Your promotion payment for Map Code ${promo.mapCode} was DISAPPROVED. Please verify your TrxID or contact support.`,
+            type: 'user_notification',
+            createdAt: new Date().toISOString()
+        });
+
+        saveData();
+        showToast("Promotion Disapproved.");
+        renderOwnerMailboxes();
+    }
+
+    function openAdminReqModal() {
+        if (!state.currentUser) { openAuthModal(); return; }
+        document.getElementById('admin-req-modal').classList.remove('hidden');
+    }
+
+    function closeAdminReqModal() {
+        document.getElementById('admin-req-modal').classList.add('hidden');
+    }
+
+    function submitAdminRequest(e) {
+        e.preventDefault();
+        const reason = document.getElementById('admin-req-reason').value.trim();
+
+        const reqMsg = {
+            id: 'admin_req_' + Date.now(),
+            senderName: state.currentUser.username,
+            senderUid: state.currentUser.uid,
+            text: `[ADMIN APPLICATION] Application Reason: ${reason}`,
+            target: 'owner',
+            type: 'admin_request',
+            createdAt: new Date().toISOString()
+        };
+
+        state.messages.push(reqMsg);
+        saveData();
+        closeAdminReqModal();
+        showToast("Admin Request Sent to Owner Inbox!");
+    }
+
+    function searchUserForAdmin() {
+        const q = document.getElementById('admin-search-input').value.toLowerCase().trim();
+        const resBox = document.getElementById('admin-search-result');
+
+        if (!q) { resBox.innerHTML = ''; return; }
+
+        const found = state.users.find(u => u.username.toLowerCase().includes(q) || u.uid.toLowerCase().includes(q));
+
+        if (!found) {
+            resBox.innerHTML = `<p class="text-xs text-red-400">No user found matching search query.</p>`;
+            return;
+        }
+
+        const isOwner = state.currentUser && state.currentUser.role === 'owner';
+
+        resBox.innerHTML = `
+            <div class="bg-ffDark p-4 rounded-xl border border-ffGold/40 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <img src="${found.pic}" class="w-12 h-12 rounded-full object-cover border border-ffBorder">
+                    <div>
+                        <h4 class="font-bold text-sm text-gray-100">${found.username}</h4>
+                        <p class="text-xs text-ffGold font-mono">UID: ${found.uid} | Email: ${found.email}</p>
+                        <span class="text-[10px] text-gray-400 uppercase">Current Role: ${found.role}</span>
+                    </div>
+                </div>
+                ${isOwner && found.role !== 'owner' && found.role !== 'admin' ? `
+                    <button onclick="makeUserAdmin('${found.id}')" class="bg-gradient-to-r from-ffOrange to-ffGold text-black font-bold px-4 py-2 rounded-xl text-xs shadow">
+                        + Add Admin
+                    </button>
+                ` : ''}
+            </div>
+        `;
+    }
+
+    function makeUserAdmin(userId) {
+        const user = state.users.find(u => u.id === userId);
+        if (!user) return;
+
+        user.role = 'admin';
+        saveData();
+        showToast(`${user.username} is now an Admin!`);
+        searchUserForAdmin();
+        renderActiveAdmins();
+    }
+
+    function removeAdminRole(userId) {
+        const user = state.users.find(u => u.id === userId);
+        if (!user) return;
+
+        user.role = 'user';
+        saveData();
+        showToast(`Admin status removed for ${user.username}`);
+        renderActiveAdmins();
+    }
+
+    function renderActiveAdmins() {
+        const container = document.getElementById('active-admins-list');
+        const admins = state.users.filter(u => u.role === 'admin');
+
+        if (admins.length === 0) {
+            container.innerHTML = `<p class="text-xs text-gray-400">No platform admins assigned yet.</p>`;
+            return;
+        }
+
+        container.innerHTML = admins.map(a => `
+            <div class="bg-ffDark p-3.5 rounded-xl border border-ffBorder flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <img src="${a.pic}" class="w-10 h-10 rounded-full object-cover">
+                    <div>
+                        <h5 class="font-bold text-sm text-gray-200">${a.username}</h5>
+                        <p class="text-xs text-ffGold font-mono">UID: ${a.uid}</p>
+                    </div>
+                </div>
+                <button onclick="removeAdminRole('${a.id}')" class="bg-red-600/20 text-red-400 hover:bg-red-600/30 border border-red-500/30 px-3 py-1.5 rounded-lg text-xs font-semibold">
+                    Revoke Admin
+                </button>
+            </div>
+        `).join('');
+    }
+
+    function renderUserDirectory() {
+        const container = document.getElementById('users-directory-list');
+        const query = document.getElementById('mod-user-search')?.value.toLowerCase() || '';
+
+        const filtered = state.users.filter(u =>
+            u.username.toLowerCase().includes(query) ||
+            u.uid.toLowerCase().includes(query) ||
+            u.email.toLowerCase().includes(query)
+        );
+
+        container.innerHTML = filtered.map(u => `
+            <div class="bg-ffDark p-3.5 rounded-xl border border-ffBorder flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <img src="${u.pic}" class="w-10 h-10 rounded-full object-cover border border-ffBorder">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <h5 class="font-bold text-sm text-gray-100">${u.username}</h5>
+                            <span class="text-[9px] uppercase px-1.5 py-0.2 rounded font-bold ${u.role === 'owner' ? 'bg-ffGold text-black' : u.role === 'admin' ? 'bg-yellow-400 text-black' : 'bg-gray-800 text-gray-400'}">${u.role}</span>
+                        </div>
+                        <p class="text-xs text-ffGold font-mono">UID: ${u.uid} | ${u.email}</p>
+                    </div>
+                </div>
+
+                ${u.role !== 'owner' ? `
+                    <button onclick="toggleBanUser('${u.id}')" class="${u.banned ? 'bg-emerald-600' : 'bg-red-600'} text-white font-bold px-3 py-1.5 rounded-lg text-xs">
+                        ${u.banned ? 'Unban' : 'Ban User'}
+                    </button>
+                ` : ''}
+            </div>
+        `).join('');
+    }
+
+    function toggleBanUser(userId) {
+        const user = state.users.find(u => u.id === userId);
+        if (!user) return;
+
+        user.banned = !user.banned;
+        saveData();
+        showToast(`User ${user.banned ? 'Banned' : 'Unbanned'} Successfully`);
+        renderUserDirectory();
+    }
+
+    function openPrimePostModal() {
+        document.getElementById('prime-post-modal').classList.remove('hidden');
+    }
+
+    function closePrimePostModal() {
+        document.getElementById('prime-post-modal').classList.add('hidden');
+    }
+
+    async function handlePrimePost(e) {
+        e.preventDefault();
+        const text = document.getElementById('prime-text').value.trim();
+        const imgFile = document.getElementById('prime-img').files[0];
+
+        let imgBase64 = '';
+        if (imgFile) imgBase64 = await fileToBase64(imgFile);
+
+        const newPrime = {
+            id: 'prime_' + Date.now(),
+            authorName: state.currentUser.username,
+            authorRole: state.currentUser.role,
+            text: text,
+            img: imgBase64,
+            createdAt: new Date().toISOString()
+        };
+
+        state.primePosts.unshift(newPrime);
+        saveData();
+        closePrimePostModal();
+        showToast("Prime Announcement Published!");
+        renderPrimeFeed();
+    }
+
+    function renderPrimeFeed() {
+        const container = document.getElementById('prime-feed-container');
+
+        // Toggle prime create button for owner/admin
+        const primeBtn = document.getElementById('prime-create-btn');
+        if (state.currentUser && (state.currentUser.role === 'owner' || state.currentUser.role === 'admin')) {
+            primeBtn.classList.remove('hidden');
+        } else {
+            primeBtn.classList.add('hidden');
+        }
+
+        if (state.primePosts.length === 0) {
+            container.innerHTML = `
+                <div class="bg-ffCard p-8 rounded-2xl border border-ffBorder text-center text-gray-400">
+                    <i class="fa-solid fa-crown text-4xl mb-2 text-yellow-500"></i>
+                    <p class="text-sm">No Prime Announcements yet.</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = state.primePosts.map(p => `
+            <div class="bg-ffCard rounded-2xl border border-yellow-500/30 p-4 space-y-3">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-crown text-yellow-400"></i>
+                    <span class="font-bold text-sm text-yellow-400">${p.authorName}</span>
+                    <span class="text-[10px] bg-yellow-400/20 text-yellow-300 px-1.5 py-0.5 rounded uppercase font-bold">${p.authorRole}</span>
+                    <span class="ml-auto text-[10px] text-gray-500">${new Date(p.createdAt).toLocaleDateString()}</span>
+                </div>
+                <p class="text-xs text-gray-200 leading-relaxed">${p.text}</p>
+                ${p.img ? `<img src="${p.img}" class="w-full h-56 object-cover rounded-xl border border-ffBorder">` : ''}
+            </div>
+        `).join('');
+    }
+</script>
+</body>
+</html>
